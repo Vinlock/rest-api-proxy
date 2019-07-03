@@ -1,0 +1,25 @@
+{
+  "name": "rest-proxy",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "dependencies": {
+    "fast-json-stringify": "^1.15.3",
+    "jitson": "^1.0.0"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.4.4",
+    "@babel/core": "^7.4.5",
+    "@babel/node": "^7.4.5",
+    "@babel/preset-flow": "^7.0.0",
+    "@types/jest": "^24.0.15",
+    "babel-jest": "^24.8.0",
+    "babel-plugin-transform-flow-strip-types": "^6.22.0",
+    "jest": "^24.8.0",
+    "nock": "^10.0.6",
+    "rewire": "^4.0.1"
+  },
+  "scripts": {
+    "test": "jest"
+  }
+}
