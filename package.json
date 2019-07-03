@@ -1,15 +1,18 @@
 {
-  "name": "rest-proxy",
+  "name": "rest-api-proxy",
   "version": "1.0.0",
   "main": "index.js",
   "license": "MIT",
+  "files": [
+    "dist"
+  ],
   "author": {
     "email": "vinlockz@gmail.com",
     "name": "Dak Washbrook",
     "url": "https://github.com/Vinlock"
   },
   "repository": {
-    "url": "https://github.com/Vinlock/rest-proxy",
+    "url": "https://github.com/Vinlock/rest-api-proxy",
     "type": "git"
   },
   "dependencies": {
@@ -31,7 +34,7 @@
   "scripts": {
     "test": "jest",
     "prebuild": "rm -rf ./dist",
-    "build": "babel -d ./dist ./app --source-maps --copy-files --verbose",
+    "build": "babel -d ./dist ./src --source-maps --copy-files --verbose",
     "prepublish": "yarn build"
   }
 }
