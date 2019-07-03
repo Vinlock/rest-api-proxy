@@ -1,7 +1,7 @@
 // @flow
 import http from 'http';
 import https from 'https';
-import { URL } from 'url';
+import { URL, URLSearchParams } from 'url';
 import jitson from 'jitson';
 import flatstr from 'flatstr';
 
@@ -44,10 +44,11 @@ const restProxy = (options: ?RestProxyOptions = {}): RestProxyRequest => {
     const { headers: additionalHeaders, query, data } = options;
     const requestMethod = method.trim().toUpperCase();
 
-    // TODO: Add in query params
-
     // Parse out the passed host
     const url = new URL(host.trim());
+
+    // Add in query params
+    url.search = (new URLSearchParams(query || {})).toString();
 
     // Check if method would have data.
     const hasData = requestMethod !== 'GET' || requestMethod !== 'DELETE';

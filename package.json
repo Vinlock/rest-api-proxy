@@ -3,6 +3,15 @@
   "version": "1.0.0",
   "main": "index.js",
   "license": "MIT",
+  "author": {
+    "email": "vinlockz@gmail.com",
+    "name": "Dak Washbrook",
+    "url": "https://github.com/Vinlock"
+  },
+  "repository": {
+    "url": "https://github.com/Vinlock/rest-proxy",
+    "type": "git"
+  },
   "dependencies": {
     "flatstr": "^1.0.12",
     "jitson": "^1.0.0"
@@ -20,6 +29,9 @@
     "rewire": "^4.0.1"
   },
   "scripts": {
-    "test": "jest"
+    "test": "jest",
+    "prebuild": "rm -rf ./dist",
+    "build": "babel -d ./dist ./app --source-maps --copy-files --verbose",
+    "prepublish": "yarn build"
   }
 }
