@@ -4,6 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "dependencies": {
+    "flatstr": "^1.0.12",
     "jitson": "^1.0.0"
   },
   "devDependencies": {

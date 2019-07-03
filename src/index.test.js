@@ -44,53 +44,106 @@ describe('restProxy', () => {
       return expect(proxy('GET', '/info', {})).resolves.toHaveProperty('body');
     });
 
-    it('should return an object with "headers" key from get call', () => {
-      // Mock request
-      nock('https://api.test.com', {
-        'X-Auth-Token': '1234',
-      }).defaultReplyHeaders({
-        'Content-Type': 'application/json',
-      }).get('/info')
-        .reply(200, {
-          info: 'received',
-          status: true,
-        }, {
-          'Content-Type': 'application/json',
-        });
-
-      // Proxy
-      const proxy = restProxy({
-        host: 'https://api.test.com',
-        headers: {
+    describe('GET request', () => {
+      it('should return an object with "headers" key from get call', () => {
+        // Mock request
+        nock('https://api.test.com', {
           'X-Auth-Token': '1234',
-        },
+        }).defaultReplyHeaders({
+          'Content-Type': 'application/json',
+        }).get('/info')
+          .reply(200, {
+            info: 'received',
+            status: true,
+          }, {
+            'Content-Type': 'application/json',
+          });
+
+        // Proxy
+        const proxy = restProxy({
+          host: 'https://api.test.com',
+          headers: {
+            'X-Auth-Token': '1234',
+          },
+        });
+        return expect(proxy('GET', '/info', {})).resolves.toHaveProperty('headers');
       });
-      return expect(proxy('GET', '/info', {})).resolves.toHaveProperty('headers');
+
+      it('should return correct response object from parsing the json', () => {
+        // Mock request
+        nock('https://api.test.com', {
+          'X-Auth-Token': '1234',
+        }).defaultReplyHeaders({
+          'Content-Type': 'application/json',
+        }).get('/info')
+          .reply(200, {
+            info: 'received',
+            status: true,
+          }, {
+            'Content-Type': 'application/json',
+          });
+
+        // Proxy
+        const proxy = restProxy({
+          host: 'https://api.test.com',
+          headers: {
+            'X-Auth-Token': '1234',
+          },
+          parseJson: true,
+        });
+        return expect(proxy('GET', '/info', {})).resolves.toHaveProperty('body.info');
+      });
     });
 
-    it('should return correct response object from parsing the json', () => {
-      // Mock request
-      nock('https://api.test.com', {
-        'X-Auth-Token': '1234',
-      }).defaultReplyHeaders({
-        'Content-Type': 'application/json',
-      }).get('/info')
-        .reply(200, {
-          info: 'received',
-          status: true,
-        }, {
-          'Content-Type': 'application/json',
-        });
-
-      // Proxy
-      const proxy = restProxy({
-        host: 'https://api.test.com',
-        headers: {
+    describe('POST request', () => {
+      it('should return an object with "headers" key from POST call', () => {
+        // Mock request
+        nock('https://api.test.com', {
           'X-Auth-Token': '1234',
-        },
-        parseJson: true,
+        }).defaultReplyHeaders({
+          'Content-Type': 'application/json',
+        }).post('/info')
+          .reply(200, {
+            info: 'received',
+            status: true,
+          }, {
+            'Content-Type': 'application/json',
+          });
+
+        // Proxy
+        const proxy = restProxy({
+          host: 'https://api.test.com',
+          headers: {
+            'X-Auth-Token': '1234',
+          },
+        });
+        return expect(proxy('POST', '/info', {})).resolves.toHaveProperty('headers');
       });
-      return expect(proxy('GET', '/info', {})).resolves.toHaveProperty('body.info');
+
+      it('should return correct response object from parsing the json', () => {
+        // Mock request
+        nock('https://api.test.com', {
+          'X-Auth-Token': '1234',
+        }).defaultReplyHeaders({
+          'Content-Type': 'application/json',
+        }).post('/info')
+          .reply(200, {
+            info: 'received',
+            status: true,
+          }, {
+            'Content-Type': 'application/json',
+          });
+
+        // Proxy
+        const proxy = restProxy({
+          host: 'https://api.test.com',
+          headers: {
+            'X-Auth-Token': '1234',
+          },
+          parseJson: true,
+        });
+        return expect(proxy('POST', '/info', {})).resolves.toHaveProperty('body.info');
+      });
     });
   });
 });

@@ -3,6 +3,7 @@ import http from 'http';
 import https from 'https';
 import { URL } from 'url';
 import jitson from 'jitson';
+import flatstr from 'flatstr';
 
 type RestProxyResponse = {
   body: ?string | ?{},
@@ -22,21 +23,14 @@ type RestProxyOptions = {
   parseJson: boolean,
 };
 
-type RestProxyRequest = (path: ?string, options: ?RestProxyRequestOptions) => Promise<RestProxyResponse>;
+type RestProxyRequest = (method: string, path: ?string, options: ?RestProxyRequestOptions) => Promise<RestProxyResponse>;
 
-type RestProxyInstance = {
-  get: RestProxyRequest,
-  post: RestProxyRequest,
-  head: RestProxyRequest,
-  delete: RestProxyRequest,
-  put: RestProxyRequest,
-};
-
-const restProxy = (options: ?RestProxyOptions = {}): RestProxyInstance => {
+const restProxy = (options: ?RestProxyOptions = {}): RestProxyRequest => {
   // Gather variables
   let { host, headers, parseJson } = options;
-  // Create instance of http or https
+  // Create instance of http or https and verify host
   const isSecure = host.startsWith('https://');
+  if (!isSecure && !host.startsWith('http://')) throw new Error('INVALID_HOST');
   let client = http;
   if (isSecure) client = https;
 
@@ -48,16 +42,25 @@ const restProxy = (options: ?RestProxyOptions = {}): RestProxyInstance => {
   return (method: string, path: ?string = '/', options: ?RestProxyRequestOptions = { parseJson: false }): Promise<RestProxyResponse> => {
     // Gather variables
     const { headers: additionalHeaders, query, data } = options;
+    const requestMethod = method.trim().toUpperCase();
 
-    const url = new URL(host);
+    // TODO: Add in query params
+
+    // Parse out the passed host
+    const url = new URL(host.trim());
+
+    // Check if method would have data.
+    const hasData = requestMethod !== 'GET' || requestMethod !== 'DELETE';
 
     // Build data
     let dataToSend = data || '';
-    if (data === Object(data)) {
-      try {
-        dataToSend = JSON.stringify(data);
-      } catch (err) {
-        dataToSend = data;
+    if (hasData) {
+      if (data === Object(data)) {
+        try {
+          dataToSend = JSON.stringify(data);
+        } catch (err) {
+          dataToSend = data;
+        }
       }
     }
 
@@ -68,25 +71,36 @@ const restProxy = (options: ?RestProxyOptions = {}): RestProxyInstance => {
       headers: {
         ...headers,
         ...additionalHeaders,
-        'Content-Length': dataToSend.length,
       },
-      method, path,
+      method: requestMethod,
+      path: path.trim(),
     };
+
+    if (hasData) {
+      requestOptions.headers['Content-Length'] = dataToSend.length;
+    }
 
     // Request
     return new Promise((resolve, reject) => {
       const request =  client.request(requestOptions, (response) => {
-        response.on('data', (responseBody) => {
+
+        let responseBody = '';
+
+        response.on('data', (body) => {
+          responseBody += body;
+        });
+
+        response.on('end', () => {
+          responseBody = flatstr(responseBody);
           if (parseJson) {
             const parse = jitson();
             responseBody = parse(responseBody);
           }
-
           resolve({
             body: responseBody,
             headers: response.headers,
             statusCode: response.statusCode,
-          });
+          })
         });
       });
 
@@ -94,7 +108,9 @@ const restProxy = (options: ?RestProxyOptions = {}): RestProxyInstance => {
         reject(error);
       });
 
-      request.write(data);
+      if (hasData) {
+        request.write(data);
+      }
       request.end();
     });
   };
